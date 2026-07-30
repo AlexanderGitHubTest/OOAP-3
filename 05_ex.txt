@@ -1,0 +1,47 @@
+Основные классы проектирования (АТД) в проекте -- только на уровне их названий (на английском) 
+и краткое описания в несколько слов (на русском).
+
+
+I. Паттерн State (Статус). Классы:
+
+Phase - Фазы программы (просто перечень фаз конечного автомата: SHAPES_DELETE_LOOP, AUTOMATIC_BONUSES_LOOP, AWAIT_COMMAND, 
+FINISH_STATE, EXIT_STATE).
+
+PhaseState - абстрактный класс с одним методом step - один шаг обработки, возвращает следующую фазу программы.
+DeletingShapesLoopState - наследник PhaseState - фаза удаления фигур.
+AutomaticBonusesHandlingLoopState - наследник PhaseState - фаза обработки автоматических бонусов.
+CommandLoopState - наследник PhaseState - фаза обработки команд игрока.
+
+Context - класс хранит текущую фазу (как композицию), признак завершения, очередь накопленных автоматических бонусов и список ручных.
+
+
+II. Паттерн Strategy (Стратегия). Классы:
+
+OutputPoint - просто перечисление точек вывода (SHAPES_DELETE_SHOW_FIND_BONUS, SHAPES_DELETE_AFTER_DELETE, 
+                                                SHAPES_DELETE_AFTER_SHIFT, SHAPES_DELETE_FINAL, AUTOMATIC_BONUSES_AFTER_USE, 
+                                                FINAL_BEFORE_WAITING_COMMAND).
+Report - само событие вывода (содержит точку вывода и прочую информацию для вывода).
+
+OutputPolicy - абстрактный класс - тип вывода (все промежуточные поля или только финальное, также можно сделать вообще без вывода (для тестирования)).
+EachBoardOutputPolicy - наследник OutputPolicy - выводить все поля.
+FinalBoardOutputPolicy - наследник OutputPolicy - выводить только финальное поле.
+NoBoardOutputPolicy - наследник OutputPolicy - не выводить никакие поля.
+
+Reporter - класс, который помнит текущий тип вывода и содержит методы для переключения типа вывода (также, как и PhaseState, его хранит Context).
+
+
+III. Паттерн Command (Команда). Классы:
+
+Command - команда игрока - абстрактный класс.
+ChangeTwoElementsCommand - наследник Command - перестановка 2-х соседних элементов.
+UseBonusCommand - наследник Command - использовать бонус.
+ShowStepHistoryCommand - наследник Command - показать историю ходов.
+QuitCommand - наследник Command - завершить игру.
+RestartCommand - наследник Command - перезапустить игру.
+ChangeToEachBoardOutput - наследник Command - переключиться в режим показа каждого поля.
+ChangeToFinalBoardOutput - наследник Command - переключиться в режим показа только финального поля.
+
+
+IV. Остальное.
+
+Engine - класс реализующий основной цикл игры.
